@@ -1,0 +1,65 @@
+{
+    // Use IntelliSense to find out which attributes exist for C# debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (current file)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/bin/Debug/net8.0/adventofcode.dll",
+            "args": ["run", "${relativeFileDirname}"],
+            "cwd": "${workspaceFolder}",
+            // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "requireExactSource": false,
+        },
+        {
+            "name": ".NET Core Launch (Year/Day)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/bin/Debug/net8.0/adventofcode.dll",
+            "args": ["run", "2023/${input:day}"],
+            "cwd": "${workspaceFolder}",
+            // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "requireExactSource": false,
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processName": "adventofcode"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "year",
+            "type": "command",
+            "command": "memento.promptString",
+            "args": {
+                "id": "year",
+                "description": "Current year (YYYY)"
+            }
+        },
+        {
+            "id": "day",
+            "type": "command",
+            "command": "memento.pickString",
+            "args": {
+                "id": "day",
+                "options": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
+                "description": "Current day"
+            }
+        }
+    ]
+}

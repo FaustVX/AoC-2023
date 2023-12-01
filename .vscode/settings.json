@@ -1,0 +1,21 @@
+{
+    "files.exclude": {
+        "bin": true,
+        "obj": true
+    },
+    "workbench.editorAssociations": {
+        "*.md": "vscode.markdown.preview.editor"
+    },
+    "[plaintext]": {
+        "files.encoding": "utf8",
+        "files.insertFinalNewline": true,
+        "files.eol": "\n",
+    },
+    "[csharp]": {
+        "files.insertFinalNewline": true,
+    },
+    "files.readonlyInclude": {
+        "lib/**": true,
+    },
+    "dotnet.defaultSolution": "AdventOfCode.sln",
+}
