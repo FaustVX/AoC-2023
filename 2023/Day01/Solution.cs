@@ -40,64 +40,34 @@ public class Solution : ISolver //, IDisplay
 
         static int GetCode(ReadOnlySpan<char> line)
         {
-            return GetFirst(line) * 10 + GetLast(line);
+            return GetValue(line, isReversed: false) * 10 + GetValue(line, isReversed: true);
 
-            static int GetFirst(ReadOnlySpan<char> line)
+            static int GetValue(ReadOnlySpan<char> line, bool isReversed)
             {
                 for (var i = 0; i < line.Length; i++)
                 {
-                    if (line[i] is >= '1' and <= '9')
-                        return line[i] - '0';
-                    switch (line[i])
+                    var j = isReversed ? line.Length - i - 1 : i;
+                    if (line[j] is >= '1' and <= '9')
+                        return line[j] - '0';
+                    switch (line[j])
                     {
-                        case 'o' when line[i..].StartsWith("one"):
+                        case 'o' when line[j..].StartsWith("one"):
                             return 1;
-                        case 't' when line[i..].StartsWith("two"):
+                        case 't' when line[j..].StartsWith("two"):
                             return 2;
-                        case 't' when line[i..].StartsWith("three"):
+                        case 't' when line[j..].StartsWith("three"):
                             return 3;
-                        case 'f' when line[i..].StartsWith("four"):
+                        case 'f' when line[j..].StartsWith("four"):
                             return 4;
-                        case 'f' when line[i..].StartsWith("five"):
+                        case 'f' when line[j..].StartsWith("five"):
                             return 5;
-                        case 's' when line[i..].StartsWith("six"):
+                        case 's' when line[j..].StartsWith("six"):
                             return 6;
-                        case 's' when line[i..].StartsWith("seven"):
+                        case 's' when line[j..].StartsWith("seven"):
                             return 7;
-                        case 'e' when line[i..].StartsWith("eight"):
+                        case 'e' when line[j..].StartsWith("eight"):
                             return 8;
-                        case 'n' when line[i..].StartsWith("nine"):
-                            return 9;
-                    }
-                }
-                throw new UnreachableException();
-            }
-
-            static int GetLast(ReadOnlySpan<char> line)
-            {
-                for (var i = line.Length - 1; i >= 0; i--)
-                {
-                    if (line[i] is >= '1' and <= '9')
-                        return line[i] - '0';
-                    switch (line[i])
-                    {
-                        case 'o' when line[i..].StartsWith("one"):
-                            return 1;
-                        case 't' when line[i..].StartsWith("two"):
-                            return 2;
-                        case 't' when line[i..].StartsWith("three"):
-                            return 3;
-                        case 'f' when line[i..].StartsWith("four"):
-                            return 4;
-                        case 'f' when line[i..].StartsWith("five"):
-                            return 5;
-                        case 's' when line[i..].StartsWith("six"):
-                            return 6;
-                        case 's' when line[i..].StartsWith("seven"):
-                            return 7;
-                        case 'e' when line[i..].StartsWith("eight"):
-                            return 8;
-                        case 'n' when line[i..].StartsWith("nine"):
+                        case 'n' when line[j..].StartsWith("nine"):
                             return 9;
                     }
                 }
