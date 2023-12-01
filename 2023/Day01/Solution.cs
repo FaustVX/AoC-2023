@@ -7,12 +7,12 @@ namespace AdventOfCode.Y2023.Day01;
 public class Solution : ISolver //, IDisplay
 {
     private static readonly SearchValues<char> _numbers = SearchValues.Create("0123456789");
-    public object PartOne(string input)
+    public object PartOne(ReadOnlyMemory<char> input)
     {
         try
         {
             var sum = 0;
-            foreach (var line in input.AsMemory().EnumerateLines())
+            foreach (var line in input.EnumerateLines())
                 sum += GetCode(line.Span);
             return sum;
 
@@ -31,10 +31,10 @@ public class Solution : ISolver //, IDisplay
         }
     }
 
-    public object PartTwo(string input)
+    public object PartTwo(ReadOnlyMemory<char> input)
     {
         var sum = 0;
-        foreach (var line in input.AsMemory().EnumerateLines())
+        foreach (var line in input.EnumerateLines())
             sum += GetCode(line.Span);
         return sum;
 
