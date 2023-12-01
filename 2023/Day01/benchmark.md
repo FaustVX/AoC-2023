@@ -10,7 +10,7 @@ Job=ShortRun  IterationCount=3  LaunchCount=1
 WarmupCount=3  
 
 ```
-| Method  | Mean     | Error    | StdDev   | Allocated |
-|-------- |---------:|---------:|---------:|----------:|
-| PartOne | 22.42 μs | 3.845 μs | 0.211 μs |      24 B |
-| PartTwo | 28.31 μs | 3.094 μs | 0.170 μs |      24 B |
+| Method  | Mean     | Error     | StdDev   | Allocated |
+|-------- |---------:|----------:|---------:|----------:|
+| PartOne | 22.36 μs |  9.546 μs | 0.523 μs |      24 B |
+| PartTwo | 32.25 μs | 71.530 μs | 3.921 μs |      24 B |
