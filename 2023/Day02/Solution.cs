@@ -1,10 +1,10 @@
 #nullable enable
 namespace AdventOfCode.Y2023.Day02;
 
-using System.Buffers;
+using System.Runtime.InteropServices;
 using static System.MemoryExtensions;
 
-file readonly record struct Hand(int Red, int Green, int Blue)
+readonly record struct Hand(int Red, int Green, int Blue)
 {
     public static readonly Hand Max = new(12, 13, 14);
 
@@ -25,7 +25,7 @@ file readonly record struct Hand(int Red, int Green, int Blue)
 
     public readonly int Power = Red * Green * Blue;
 
-    public static Hand Parse(ReadOnlySpan<char> line) // line format: " 3 blue, 4 red" (note the heading space)
+    public static Hand Parse(ReadOnlySpan<char> line) // line format: " 3 blue, 4 red" (note the leading space)
     {
         var (r, g, b) = (0, 0, 0);
         do
@@ -47,29 +47,15 @@ file readonly record struct Hand(int Red, int Green, int Blue)
     }
 }
 
-file readonly ref struct Game(int id, Game.ArrayRental hands)
+[StructLayout(LayoutKind.Auto)]
+readonly ref partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands)
 {
-    private static readonly ArrayPool<Hand> _pool = ArrayPool<Hand>.Create(10, 1);
-
-    public int Id { get; } = id;
-    public ArrayRental Hands { get; } = hands;
-
-    public readonly struct ArrayRental(Hand[] array, int length)
-    {
-        public readonly Span<Hand> Span => array.AsSpan(0, length);
-        public readonly void Return()
-        => _pool.Return(array);
-    }
-
-    private static ArrayRental RentArray(int length)
-    => new(_pool.Rent(length), length);
-
     public static Game Parse(ReadOnlySpan<char> line)
     {
         var colon = line.IndexOf(':');
         var id = int.Parse(line[5..colon]);
         line = line[(colon + 1)..];
-        var rental = RentArray(line.Count(';') + 1);
+        var rental = ArrayRental<Hand>.Rent(line.Count(';') + 1);
         foreach (ref var hand in rental.Span)
         {
             var semi_colon = line.IndexOf(';');
