@@ -1,6 +1,7 @@
 #nullable enable
 namespace AdventOfCode.Y2023.Day02;
 
+using System.Buffers;
 using System.Runtime.InteropServices;
 using static System.MemoryExtensions;
 
@@ -50,6 +51,9 @@ readonly record struct Hand(int Red, int Green, int Blue)
 [StructLayout(LayoutKind.Auto)]
 readonly partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands) : IDisposable
 {
+    static Game()
+    => ArrayRental<Hand>.PoolGenerator = static () => ArrayPool<Hand>.Create(10, 1);
+
     public static Game Parse(ReadOnlySpan<char> line)
     {
         var colon = line.IndexOf(':');
