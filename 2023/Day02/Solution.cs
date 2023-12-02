@@ -17,6 +17,13 @@ file record struct Hand(int Red, int Green, int Blue)
     || left.Green > right.Green
     || left.Blue > right.Blue;
 
+    public static Hand operator +(Hand left, Hand right)
+    => new (Math.Max(left.Red, right.Red),
+            Math.Max(left.Green, right.Green),
+            Math.Max(left.Blue, right.Blue));
+
+    public readonly int Power = Red * Green * Blue;
+
     public static Hand Parse(ReadOnlySpan<char> line) // line format: " 3 blue, 4 red" (note the heading space)
     {
         var (r, g, b) = (0, 0, 0);
@@ -68,6 +75,14 @@ file record struct Game(int Id, Hand[] Hands)
                 return false;
         return true;
     }
+
+    public readonly Hand GetMinimumValidGame()
+    {
+        var min = Hands[0];
+        foreach (var hand in Hands)
+            min += hand; // + is overloaded
+        return min;
+    }
 }
 
 [ProblemName("Cube Conundrum")]
@@ -87,6 +102,12 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        return 0;
+        var powerSum = 0;
+        foreach (var line in input.EnumerateLines())
+        {
+            var game = Game.Parse(line.Span);
+            powerSum += game.GetMinimumValidGame().Power;
+        }
+        return powerSum;
     }
 }
