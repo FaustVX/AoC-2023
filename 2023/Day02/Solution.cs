@@ -3,7 +3,7 @@ namespace AdventOfCode.Y2023.Day02;
 
 using static System.MemoryExtensions;
 
-file record struct Hand(int Red, int Green, int Blue)
+file readonly record struct Hand(int Red, int Green, int Blue)
 {
     public static readonly Hand Max = new(12, 13, 14);
 
@@ -46,7 +46,7 @@ file record struct Hand(int Red, int Green, int Blue)
     }
 }
 
-file record struct Game(int Id, Hand[] Hands)
+file readonly record struct Game(int Id, Hand[] Hands)
 {
     public static Game Parse(ReadOnlySpan<char> line)
     {
