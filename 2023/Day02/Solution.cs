@@ -1,9 +1,10 @@
 #nullable enable
 namespace AdventOfCode.Y2023.Day02;
 
+using System.Runtime.InteropServices;
 using static System.MemoryExtensions;
 
-file record struct Hand(int Red, int Green, int Blue)
+readonly record struct Hand(int Red, int Green, int Blue)
 {
     public static readonly Hand Max = new(12, 13, 14);
 
@@ -24,7 +25,7 @@ file record struct Hand(int Red, int Green, int Blue)
 
     public readonly int Power = Red * Green * Blue;
 
-    public static Hand Parse(ReadOnlySpan<char> line) // line format: " 3 blue, 4 red" (note the heading space)
+    public static Hand Parse(ReadOnlySpan<char> line) // line format: " 3 blue, 4 red" (note the leading space)
     {
         var (r, g, b) = (0, 0, 0);
         do
@@ -46,15 +47,16 @@ file record struct Hand(int Red, int Green, int Blue)
     }
 }
 
-file record struct Game(int Id, Hand[] Hands)
+[StructLayout(LayoutKind.Auto)]
+readonly partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands) : IDisposable
 {
     public static Game Parse(ReadOnlySpan<char> line)
     {
         var colon = line.IndexOf(':');
         var id = int.Parse(line[5..colon]);
         line = line[(colon + 1)..];
-        var hands = new Hand[line.Count(';') + 1];
-        foreach (ref var hand in hands.AsSpan())
+        var rental = ArrayRental<Hand>.Rent(line.Count(';') + 1);
+        foreach (ref var hand in rental.Span)
         {
             var semi_colon = line.IndexOf(';');
             if (semi_colon < 0)
@@ -65,12 +67,12 @@ file record struct Game(int Id, Hand[] Hands)
                 line = line[(semi_colon + 1)..];
             }
         }
-        return new(id, hands);
+        return new(id, rental);
     }
 
     public readonly bool IsValidGame()
     {
-        foreach (var hand in Hands)
+        foreach (var hand in Hands.Span)
             if (hand > Hand.Max)
                 return false;
         return true;
@@ -78,36 +80,33 @@ file record struct Game(int Id, Hand[] Hands)
 
     public readonly Hand GetMinimumValidGame()
     {
-        var min = Hands[0];
-        foreach (var hand in Hands)
+        var min = Hands.Span[0];
+        foreach (var hand in Hands.Span)
             min += hand; // + is overloaded
         return min;
     }
+
+    void IDisposable.Dispose()
+    => Hands.Return();
 }
 
 [ProblemName("Cube Conundrum")]
 public class Solution : ISolver //, IDisplay
 {
-    public object PartOne(ReadOnlyMemory<char> input)
+    private static int Execute(ReadOnlyMemory<char> input, Func<Game, int> getValue)
     {
         var idSum = 0;
         foreach (var line in input.EnumerateLines())
         {
-            var game = Game.Parse(line.Span);
-            if (game.IsValidGame())
-                idSum += game.Id;
+            using var game = Game.Parse(line.Span);
+            idSum += getValue(game);
         }
         return idSum;
     }
 
+    public object PartOne(ReadOnlyMemory<char> input)
+    => Execute(input, static game => game.IsValidGame() ? game.Id : 0);
+
     public object PartTwo(ReadOnlyMemory<char> input)
-    {
-        var powerSum = 0;
-        foreach (var line in input.EnumerateLines())
-        {
-            var game = Game.Parse(line.Span);
-            powerSum += game.GetMinimumValidGame().Power;
-        }
-        return powerSum;
-    }
+    => Execute(input, static game => game.GetMinimumValidGame().Power);
 }
