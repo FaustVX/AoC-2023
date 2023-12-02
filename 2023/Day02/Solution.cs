@@ -48,7 +48,7 @@ readonly record struct Hand(int Red, int Green, int Blue)
 }
 
 [StructLayout(LayoutKind.Auto)]
-readonly ref partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands)
+readonly partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands) : IDisposable
 {
     public static Game Parse(ReadOnlySpan<char> line)
     {
@@ -86,33 +86,27 @@ readonly ref partial struct Game([Property]int id, [Property]ArrayRental<Hand> h
         return min;
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     => Hands.Return();
 }
 
 [ProblemName("Cube Conundrum")]
 public class Solution : ISolver //, IDisplay
 {
-    public object PartOne(ReadOnlyMemory<char> input)
+    private static int Execute(ReadOnlyMemory<char> input, Func<Game, int> getValue)
     {
         var idSum = 0;
         foreach (var line in input.EnumerateLines())
         {
             using var game = Game.Parse(line.Span);
-            if (game.IsValidGame())
-                idSum += game.Id;
+            idSum += getValue(game);
         }
         return idSum;
     }
 
+    public object PartOne(ReadOnlyMemory<char> input)
+    => Execute(input, static game => game.IsValidGame() ? game.Id : 0);
+
     public object PartTwo(ReadOnlyMemory<char> input)
-    {
-        var powerSum = 0;
-        foreach (var line in input.EnumerateLines())
-        {
-            using var game = Game.Parse(line.Span);
-            powerSum += game.GetMinimumValidGame().Power;
-        }
-        return powerSum;
-    }
+    => Execute(input, static game => game.GetMinimumValidGame().Power);
 }
