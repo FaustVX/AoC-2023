@@ -1,9 +1,13 @@
 #nullable enable
+using System.Buffers;
+
 namespace AdventOfCode.Y2023.Day03;
 
 [ProblemInfo("Gear Ratios", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
 {
+    private static readonly SearchValues<char> _digitsOrDot = SearchValues.Create(".0123456789");
+
     public object PartOne(ReadOnlyMemory<char> input)
     {
         var lines = GetLines(input);
@@ -51,9 +55,8 @@ public class Solution : ISolver //, IDisplay
     private static bool IsValidPartNumber(TextSpan span, ReadOnlySpan2D<char> input)
     {
         for (var i = 0; i < span.Length; i++)
-            foreach (var c in GetArround(span.Column + i, span.Line, input))
-                if (c is not ((>= '0' and  <= '9') or '.'))
-                    return true;
+            if (GetArround(span.Column + i, span.Line, input).ContainsAnyExcept(_digitsOrDot))
+                return true;
         return false;
 
         static ReadOnlySpan2D<char> GetArround(int x, int y, ReadOnlySpan2D<char> input)
@@ -69,11 +72,7 @@ public class Solution : ISolver //, IDisplay
         var (part1, part2) = (-1, -1);
         foreach (var part in parts)
             if (gear.Line >= part.Line - 1 && gear.Line <= part.Line + 1 && gear.Column >= part.Column - 1 && gear.Column <= part.Column + part.Length)
-                if (part1 is -1)
-                    part1 = int.Parse(part.GetSpan(input));
-                else if (part2 is -1)
-                    part2 = int.Parse(part.GetSpan(input));
-                else
+                if (!TrySetValue(ref part1, part, input) && !TrySetValue(ref part2, part, input))
                     break;
         if ((part1, part2) is not (> -1, > -1))
         {
@@ -82,6 +81,14 @@ public class Solution : ISolver //, IDisplay
         }
         gearRatio = part1 * part2;
         return true;
+
+        static bool TrySetValue(ref int partX, TextSpan part, ReadOnlySpan2D<char> input)
+        {
+            if (partX is not -1)
+                return false;
+            partX = int.Parse(part.GetSpan(input));
+            return true;
+        }
     }
 }
 
