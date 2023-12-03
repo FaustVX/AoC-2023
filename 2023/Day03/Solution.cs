@@ -1,9 +1,13 @@
 #nullable enable
+using System.Buffers;
+
 namespace AdventOfCode.Y2023.Day03;
 
 [ProblemInfo("Gear Ratios", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
 {
+    private static readonly SearchValues<char> _digitsOrDot = SearchValues.Create(".0123456789");
+
     public object PartOne(ReadOnlyMemory<char> input)
     {
         var lines = GetLines(input);
@@ -51,9 +55,8 @@ public class Solution : ISolver //, IDisplay
     private static bool IsValidPartNumber(TextSpan span, ReadOnlySpan2D<char> input)
     {
         for (var i = 0; i < span.Length; i++)
-            foreach (var c in GetArround(span.Column + i, span.Line, input))
-                if (c is not ((>= '0' and  <= '9') or '.'))
-                    return true;
+            if (GetArround(span.Column + i, span.Line, input).ContainsAnyExcept(_digitsOrDot))
+                return true;
         return false;
 
         static ReadOnlySpan2D<char> GetArround(int x, int y, ReadOnlySpan2D<char> input)
