@@ -6,11 +6,10 @@ public class Solution : ISolver //, IDisplay
 {
     public object PartOne(ReadOnlyMemory<char> input)
     {
-        var lineLength = input.Span.IndexOf('\n') + 1;
-        var lines = input.AsMemory2D(input.Length / lineLength, lineLength)[.., ..^1];
+        var lines = GetLines(input);
         var partSum = 0;
-        foreach (var span in GetSpans(lines))
-            if (IsValidSpan(span, lines.Span))
+        foreach (var span in GetSpans(lines, char.IsDigit))
+            if (IsValidPartNumber(span, lines.Span))
                 partSum += int.Parse(span.GetSpan(lines.Span));
         return partSum;
     }
@@ -20,12 +19,18 @@ public class Solution : ISolver //, IDisplay
         return 0;
     }
 
-    private static IEnumerable<TextSpan> GetSpans(ReadOnlyMemory2D<char> input)
+    public static ReadOnlyMemory2D<char> GetLines(ReadOnlyMemory<char> input)
+    {
+        var lineLength = input.Span.IndexOf('\n') + 1;
+        return input.AsMemory2D(input.Length / lineLength, lineLength)[.., ..^1];
+    }
+
+    private static IEnumerable<TextSpan> GetSpans(ReadOnlyMemory2D<char> input, Func<char, bool> isIncluded)
     {
         var currentSpan = default(TextSpan);
         for (var y = 0; y < input.Height; y++)
         for (var x = 0; x < input.Width; x++)
-            if (input.Span[y, x] is >= '0' and <= '9')
+            if (isIncluded(input.Span[y, x]))
                 if (currentSpan == default)
                     currentSpan = new(x, y, 1);
                 else
@@ -37,7 +42,7 @@ public class Solution : ISolver //, IDisplay
             }
     }
 
-    private static bool IsValidSpan(TextSpan span, ReadOnlySpan2D<char> input)
+    private static bool IsValidPartNumber(TextSpan span, ReadOnlySpan2D<char> input)
     {
         for (var i = 0; i < span.Length; i++)
             foreach (var c in GetArround(span.Column + i, span.Line, input))
