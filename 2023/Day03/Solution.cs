@@ -16,7 +16,13 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        return 0;
+        var lines = GetLines(input);
+        var parts = GetSpans(lines, char.IsDigit).ToArray();
+        var gearRatioSum = 0;
+        foreach (var span in GetSpans(lines, static c => c is '*'))
+            if (IsValidGear(span, lines.Span, parts, out var ratio))
+                gearRatioSum += ratio;
+        return gearRatioSum;
     }
 
     public static ReadOnlyMemory2D<char> GetLines(ReadOnlyMemory<char> input)
@@ -56,6 +62,26 @@ public class Solution : ISolver //, IDisplay
             var height = Math.Max(0, y - 1)..Math.Min(input.Height - 1, y + 2);
             return input[height, width];
         }
+    }
+
+    private static bool IsValidGear(TextSpan gear, ReadOnlySpan2D<char> input, IEnumerable<TextSpan> parts, out int gearRatio)
+    {
+        var (part1, part2) = (-1, -1);
+        foreach (var part in parts)
+            if (gear.Line >= part.Line - 1 && gear.Line <= part.Line + 1 && gear.Column >= part.Column - 1 && gear.Column <= part.Column + part.Length)
+                if (part1 is -1)
+                    part1 = int.Parse(part.GetSpan(input));
+                else if (part2 is -1)
+                    part2 = int.Parse(part.GetSpan(input));
+                else
+                    break;
+        if ((part1, part2) is not (> -1, > -1))
+        {
+            gearRatio = 0;
+            return false;
+        }
+        gearRatio = part1 * part2;
+        return true;
     }
 }
 
