@@ -69,11 +69,7 @@ public class Solution : ISolver //, IDisplay
         var (part1, part2) = (-1, -1);
         foreach (var part in parts)
             if (gear.Line >= part.Line - 1 && gear.Line <= part.Line + 1 && gear.Column >= part.Column - 1 && gear.Column <= part.Column + part.Length)
-                if (part1 is -1)
-                    part1 = int.Parse(part.GetSpan(input));
-                else if (part2 is -1)
-                    part2 = int.Parse(part.GetSpan(input));
-                else
+                if (!TrySetValue(ref part1, part, input) && !TrySetValue(ref part2, part, input))
                     break;
         if ((part1, part2) is not (> -1, > -1))
         {
@@ -82,6 +78,14 @@ public class Solution : ISolver //, IDisplay
         }
         gearRatio = part1 * part2;
         return true;
+
+        static bool TrySetValue(ref int partX, TextSpan part, ReadOnlySpan2D<char> input)
+        {
+            if (partX is not -1)
+                return false;
+            partX = int.Parse(part.GetSpan(input));
+            return true;
+        }
     }
 }
 
