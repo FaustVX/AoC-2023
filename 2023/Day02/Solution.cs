@@ -94,7 +94,7 @@ readonly partial struct Game([Property]int id, [Property]ArrayRental<Hand> hands
     => Hands.Return();
 }
 
-[ProblemName("Cube Conundrum")]
+[ProblemInfo("Cube Conundrum")]
 public class Solution : ISolver //, IDisplay
 {
     private static int Execute(ReadOnlyMemory<char> input, Func<Game, int> getValue)

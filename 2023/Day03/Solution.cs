@@ -1,7 +1,7 @@
 #nullable enable
 namespace AdventOfCode.Y2023.Day03;
 
-[ProblemName("Gear Ratios")]
+[ProblemInfo("Gear Ratios", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
 {
     public object PartOne(ReadOnlyMemory<char> input)
