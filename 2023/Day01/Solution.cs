@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace AdventOfCode.Y2023.Day01;
 
-[ProblemName("Trebuchet?!")]
+[ProblemInfo("Trebuchet?!")]
 public class Solution : ISolver //, IDisplay
 {
     private static readonly SearchValues<char> _numbers = SearchValues.Create("0123456789");
