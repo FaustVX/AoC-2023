@@ -29,7 +29,29 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        return 0;
+        var lines = GetLines(input, out var pipe);
+        var copies = (stackalloc int[lines.Height]);
+        copies.Fill(1);
+        var winningSpan = (stackalloc int[(pipe - 1 - 9) / 3]);
+        var mineSpan = (stackalloc int[(lines.Width - (pipe - 1)) / 3]);
+
+        for (int i = 0; i < lines.Height; i++)
+        {
+            ParseInts(lines.Span.GetRowSpan(i)[9..(pipe - 1)], winningSpan);
+            ParseInts(lines.Span.GetRowSpan(i)[(pipe + 1)..], mineSpan);
+            var count = 0;
+            foreach (var item in winningSpan)
+                if (mineSpan.Contains(item))
+                    count++;
+
+            foreach (ref var copy in copies.Slice(i + 1, count))
+                copy += copies[i];
+        }
+
+        var sum = 0;
+        foreach (var copy in copies)
+            sum += copy;
+        return sum;
     }
 
     public static ReadOnlyMemory2D<char> GetLines(ReadOnlyMemory<char> input, out int pipeIndex)
