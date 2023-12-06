@@ -12,9 +12,7 @@ public class Solution : ISolver //, IDisplay
         var min = uint.MaxValue;
         foreach (var seed in seeds)
         {
-            var number = seed;
-            foreach (var map in maps)
-                number = map.NextNumber(number);
+            var number = GetLocationFromSeed(seed, maps);
             number.SetMin(ref min);
         }
         return min;
@@ -22,7 +20,68 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        return 0;
+        var (maps, seeds) = ParseInput(input.Span);
+        var ranges = seeds.AsSpan().Cast<uint, Range>();
+
+        if (Globals.IsTestInput)
+            return GetMinTest(maps, ranges);
+        return GetMin(maps, ranges, 100_000);
+
+        static uint GetMin(ReadOnlySpan<Map> maps, ReadOnlySpan<Range> ranges, uint jump)
+        {
+            var (min, minRange) = (uint.MaxValue, new Range(0U, 0U));
+            foreach (var (start, length) in ranges)
+                for (var s = 0u; s < length; s += jump)
+                {
+                    var number = GetLocationFromSeed(start + s, maps);
+                    if (number < min)
+                        (min, minRange) = (number, new(start, length));
+                }
+
+            if (jump <= 100)
+                return GetMinTest(maps, ranges);
+
+            var newRanges = (stackalloc Range[11]);
+            GetSmallerRanges(minRange, ref newRanges);
+            return GetMin(maps, newRanges, jump / 100);
+
+            static void GetSmallerRanges(Range range, ref Span<Range> ranges)
+            {
+                var start = range.Start;
+                var length = range.Length / 10;
+
+                foreach (ref var r in ranges[..10])
+                {
+                    r = new(start, length);
+                    start += length;
+                }
+
+                var last = range.Length % 10;
+                if (last is 0)
+                    ranges = ranges[..10];
+                else
+                    ranges[^1] = new (start, last);
+            }
+        }
+
+        static uint GetMinTest(ReadOnlySpan<Map> maps, ReadOnlySpan<Range> ranges)
+        {
+            var min = uint.MaxValue;
+            foreach (var (start, length) in ranges)
+                for (var s = 0u; s < length; s++)
+                {
+                    var number = GetLocationFromSeed(start + s, maps);
+                    number.SetMin(ref min);
+                }
+            return min;
+        }
+    }
+
+    static uint GetLocationFromSeed(uint number, ReadOnlySpan<Map> maps)
+    {
+        foreach (var map in maps)
+            number = map.NextNumber(number);
+        return number;
     }
 
     private static (Map[] maps, uint[] seeds) ParseInput(ReadOnlySpan<char> input)
@@ -81,6 +140,8 @@ readonly record struct Map(Span[] Spans)
         return new(spans);
     }
 }
+
+readonly record struct Range(uint Start, uint Length);
 
 readonly record struct Span(uint Destination, uint Source, int Length)
 {
