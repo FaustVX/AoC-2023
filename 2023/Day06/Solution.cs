@@ -4,7 +4,7 @@ namespace AdventOfCode.Y2023.Day06;
 [ProblemInfo("Wait For It")]
 public class Solution : ISolver //, IDisplay
 {
-    // https://www.desmos.com/calculator/lcw2jcaoje
+    // https://www.desmos.com/calculator/pd7bdyskxx
     public object PartOne(ReadOnlyMemory<char> input)
     {
         var infos = (stackalloc Info[Globals.IsTestInput ? 3 : 4]);
