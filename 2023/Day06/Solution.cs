@@ -9,7 +9,16 @@ public class Solution : ISolver //, IDisplay
     {
         var infos = (stackalloc Info[Globals.IsTestInput ? 3 : 4]);
         ParseInput(input.Span, infos);
-        return 0;
+        var product = 1;
+        foreach (var (duration, record) in infos)
+        {
+            var count = 0;
+            for (var t = 1; t < duration; t++)
+                if ((duration - t) * t > record)
+                    count++;
+            product *= count;
+        }
+        return product;
     }
 
     public object PartTwo(ReadOnlyMemory<char> input)
@@ -27,7 +36,7 @@ public class Solution : ISolver //, IDisplay
         {
             var line = lines.Current.Slice(start, Math.Min(offset, lines.Current.Length - start));
             start += offset;
-            info = info with { Time = int.Parse(line) };
+            info = info with { Duration = int.Parse(line) };
         }
         start = 10;
         lines.MoveNext();
@@ -35,9 +44,9 @@ public class Solution : ISolver //, IDisplay
         {
             var line = lines.Current.Slice(start, Math.Min(offset, lines.Current.Length - start));
             start += offset;
-            info = info with { Distance = int.Parse(line) };
+            info = info with { Record = int.Parse(line) };
         }
     }
 }
 
-readonly record struct Info(int Time, int Distance);
+readonly record struct Info(int Duration, int Record);
