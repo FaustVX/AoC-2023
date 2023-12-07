@@ -10,14 +10,8 @@ public class Solution : ISolver //, IDisplay
         var infos = (stackalloc Info[Globals.IsTestInput ? 3 : 4]);
         ParseInput(input.Span, infos);
         var product = 1;
-        foreach (var (duration, record) in infos)
-        {
-            var count = 0;
-            for (var t = 1; t < duration; t++)
-                if ((duration - t) * t > record)
-                    count++;
-            product *= count;
-        }
+        foreach (var info in infos)
+            product *= info.Count();
         return product;
     }
 
@@ -49,4 +43,14 @@ public class Solution : ISolver //, IDisplay
     }
 }
 
-readonly record struct Info(int Duration, int Record);
+readonly record struct Info(int Duration, int Record)
+{
+    public int Count()
+    {
+        var count = 0;
+        for (var t = 1; t < Duration; t++)
+            if ((Duration - t) * t > Record)
+                count++;
+        return count;
+    }
+}
