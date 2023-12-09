@@ -9,33 +9,23 @@ using static System.MemoryExtensions;
 public class Solution : ISolver //, IDisplay
 {
     public object PartOne(ReadOnlyMemory<char> input)
-    {
-        var hands = (stackalloc Hand[input.Span.Count('\n')]);
-        var lines = input.Span.EnumerateLines();
-        foreach (ref var hand in hands)
-        {
-            lines.MoveNext();
-            hand = Hand.Parse(lines.Current);
-        }
-        hands.Sort(Hand.CompareTo_P1);
-
-        var score = 0;
-        for (var i = 0; i < hands.Length; i++)
-            score += (i + 1) * hands[i].Bid;
-        return score;
-    }
+    => Execute(input.Span, false, Hand.CompareTo_P1);
 
     public object PartTwo(ReadOnlyMemory<char> input)
+    => Execute(input.Span, true, Hand.CompareTo_P2);
+
+    private static int Execute(ReadOnlySpan<char> input, bool isP2, Comparison<Hand> comparer)
     {
-        var hands = (stackalloc Hand[input.Span.Count('\n')]);
-        var lines = input.Span.EnumerateLines();
+        var hands = (stackalloc Hand[input.Count('\n')]);
+        var lines = input.EnumerateLines();
         foreach (ref var hand in hands)
         {
             lines.MoveNext();
             hand = Hand.Parse(lines.Current);
-            Hand.ReplaceCards(hand.Span, Rank.J, Rank._J);
+            if (isP2)
+                Hand.ReplaceCards(hand.Span, Rank.J, Rank._J);
         }
-        hands.Sort(Hand.CompareTo_P2);
+        hands.Sort(comparer);
 
         var score = 0;
         for (var i = 0; i < hands.Length; i++)
