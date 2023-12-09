@@ -1,6 +1,8 @@
 #nullable enable
 namespace AdventOfCode.Y2023.Day07;
 
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static System.MemoryExtensions;
 
 [ProblemInfo("Camel Cards", normalizeInput: false)]
@@ -31,11 +33,15 @@ public class Solution : ISolver //, IDisplay
 
 readonly record struct Hand(Rank Card1, Rank Card2, Rank Card3, Rank Card4, Rank Card5, ushort Bid)
 {
+    // see: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-12.0/inline-arrays#obtaining-instances-of-span-types-for-an-inline-array-type
+    public readonly Span<Rank> Span => MemoryMarshal.CreateSpan(ref Unsafe.As<Hand, Rank>(ref Unsafe.AsRef(in this)), 5);
+
     public readonly Type Type
     {
         get
         {
-            var cards = (stackalloc Rank[5] { Card1, Card2, Card3, Card4, Card5 });
+            var cards = (stackalloc Rank[5]);
+            Span.CopyTo(cards);
             cards.Sort();
             if ((IsFive(cards)
             ?? IsFour(cards)
@@ -75,7 +81,7 @@ readonly record struct Hand(Rank Card1, Rank Card2, Rank Card3, Rank Card4, Rank
             return true;
         if (left.Type < right.Type)
             return false;
-        return CompareHands([left.Card1, left.Card2, left.Card3, left.Card4, left.Card5], [right.Card1, right.Card2, right.Card3, right.Card4, right.Card5]);
+        return CompareHands(left.Span, right.Span);
 
         static bool CompareHands(ReadOnlySpan<Rank> left, ReadOnlySpan<Rank> right)
         {
