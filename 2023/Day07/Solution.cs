@@ -131,7 +131,7 @@ readonly record struct Hand(Rank Card1, Rank Card2, Rank Card3, Rank Card4, Rank
     public static void ReplaceCards(Span<Rank> cards, Rank replaced, Rank by)
     {
         foreach (ref var c in cards)
-            if (c.Equals(replaced))
+            if (c == replaced)
                 c = by;
     }
 
