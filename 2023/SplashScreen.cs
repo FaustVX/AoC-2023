@@ -6,16 +6,19 @@ class SplashScreenImpl : ISplashScreen
     {
         var color = Console.ForegroundColor;
         Write(0xcc00, false, "           ▄█▄ ▄▄█ ▄ ▄ ▄▄▄ ▄▄ ▄█▄  ▄▄▄ ▄█  ▄▄ ▄▄▄ ▄▄█ ▄▄▄\n           █▄█ █ █ █ █ █▄█ █ █ █   █ █ █▄ ");
-        Write(0xcc00, false, " █  █ █ █ █ █▄█\n           █ █ █▄█ ▀▄▀ █▄▄ █ █ █▄  █▄█ █   █▄ █▄█ █▄█ █▄▄  $year = 2023\n            ");
+        Write(0xcc00, false, " █  █ █ █ █ █▄█\n           █ █ █▄█ ▀▄▀ █▄▄ █ █ █▄  █▄█ █   █▄ █▄█ █▄█ █▄▄  λy.2023\n            \n    ");
+        Write(0xcc00, false, "                                                        \n                                           ");
+        Write(0xcc00, false, "                 \n                                                            \n                     ");
+        Write(0xcc00, false, "                                       \n                                                            ");
         Write(0xcc00, false, "\n                                                            \n                                      ");
-        Write(0xcc00, false, "                      \n                                                            \n                ");
-        Write(0xcc00, false, "                                            \n                                                       ");
-        Write(0xcc00, false, "     \n                                                            \n                                 ");
-        Write(0xcc00, false, "                           \n                                                            \n           ");
-        Write(0xcc00, false, "                                                 \n                                                  ");
-        Write(0xcc00, false, "          \n                                                            \n           ");
-        Write(0x333333, false, "                    *                              ");
-        Write(0x666666, false, " 8\n                                                            \n                             *      ");
+        Write(0xcc00, false, "                      \n                                                            \n           ");
+        Write(0x333333, false, "            *                                      ");
+        Write(0x666666, false, "10\n                                                            \n                          *         ");
+        Write(0x666666, false, "                          ");
+        Write(0xcccccc, false, " 9 ");
+        Write(0x666666, false, "**\n                               *                              ");
+        Write(0xcccccc, false, " 8 ");
+        Write(0x666666, false, "**\n                                                            \n                             *      ");
         Write(0x666666, false, "      ");
         Write(0xcc00, false, ".'''''''''...       ");
         Write(0xcccccc, false, " 7 ");
