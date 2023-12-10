@@ -30,37 +30,63 @@ public class Solution : ISolver //, IDisplay
     public object PartTwo(ReadOnlyMemory<char> input)
     {
         ParseInput(input.Span, out var tape, out var nodes);
-        var currents = CountLinesEndingInA(nodes, stackalloc int[10]);
-        for (var i = 0UL; i < ulong.MaxValue; i++)
+        var currents = CountLinesEndingInA(nodes, stackalloc (int line, int length)[10]);
+        foreach (ref var current in currents)
         {
-            if (IsAllInZ(currents, nodes))
-                return i;
-            foreach (ref var current in currents)
+            for (var i = 0; i < int.MaxValue; i++)
             {
-                _ = tape[(int)(i % (ulong)tape.Length)] switch
+                if (Node.Parse(nodes.GetRowSpan(current.line)).Name[^1] is 'Z')
                 {
-                    'L' => GetNode(Node.Parse(nodes.GetRowSpan(current)).Left, nodes, out current),
-                    'R' => GetNode(Node.Parse(nodes.GetRowSpan(current)).Right, nodes, out current),
+                    current.length = i;
+                    break;
+                }
+                _ = tape[i % tape.Length] switch
+                {
+                    'L' => GetNode(Node.Parse(nodes.GetRowSpan(current.line)).Left, nodes, out current.line),
+                    'R' => GetNode(Node.Parse(nodes.GetRowSpan(current.line)).Right, nodes, out current.line),
                     _ => throw new UnreachableException(),
                 };
             }
+            if (current.length is 0)
+                throw new UnreachableException();
         }
-        throw new UnreachableException();
+        return Lcm(currents);
 
-        static Span<int> CountLinesEndingInA(ReadOnlySpan2D<char> nodes, Span<int> currents)
+        static ulong Lcm(ReadOnlySpan<(int, int)> arr)
+        {
+            ulong lcm = (ulong)arr[0].Item2;
+            for (int i = 1; i < arr.Length; i++) {
+                var num1 = lcm;
+                var num2 = (ulong)arr[i].Item2;
+                var gcdVal = Gcd(num1, num2);
+                lcm = (lcm * (ulong)arr[i].Item2) / gcdVal;
+            }
+            return lcm;
+
+            static ulong Gcd(ulong num1, ulong num2)
+            {
+                if (num2 == 0)
+                    return num1;
+                return Gcd(num2, num1 % num2);
+            }
+        }
+
+        static Span<(int line, int length)> CountLinesEndingInA(ReadOnlySpan2D<char> nodes, Span<(int line, int length)> currents)
         {
             var count = 0;
             for (var n = 0; n < nodes.Height; n++)
                 if (nodes.GetRowSpan(n)[2] is 'A')
-                    currents[count++] = n;
+                    currents[count++] = (n, 0);
             return currents[..count];
         }
 
-        static bool IsAllInZ(ReadOnlySpan<int> lines, ReadOnlySpan2D<char> nodes)
+        static bool IsAllInZ(Span<(int line, int length)> lines, ReadOnlySpan2D<char> nodes, int length)
         {
-            foreach (var line in lines)
-                if (Node.Parse(nodes.GetRowSpan(line)).Name[^1] is not 'Z')
+            foreach (ref var line in lines)
+                if (Node.Parse(nodes.GetRowSpan(line.line)).Name[^1] is not 'Z')
                     return false;
+                else
+                    line.length = length;
             return true;
         }
     }
