@@ -4,6 +4,7 @@ namespace AdventOfCode.Y2023.Day08;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using CommunityToolkit.HighPerformance.Enumerables;
 using static System.MemoryExtensions;
 
 [ProblemInfo("Haunted Wasteland", normalizeInput: false)]
@@ -50,17 +51,20 @@ public class Solution : ISolver //, IDisplay
             if (current.length is 0)
                 throw new UnreachableException();
         }
-        return Lcm(currents);
 
-        static long Lcm(ReadOnlySpan<(int line, int length)> arr)
+        var casted = currents.Cast<(int, int), int>();
+        var span2D = casted.AsSpan2D(currents.Length, 2);
+        return Lcm(span2D.GetColumn(1));
+
+        static long Lcm(ReadOnlyRefEnumerable<int> arr)
         {
-            var lcm = (long)arr[0].length;
+            var lcm = (long)arr[0];
             for (var i = 1; i < arr.Length; i++)
             {
                 var num1 = lcm;
-                var num2 = (long)arr[i].length;
+                var num2 = (long)arr[i];
                 var gcdVal = Gcd(num1, num2);
-                lcm = (lcm * (long)arr[i].length) / gcdVal;
+                lcm = (lcm * (long)arr[i]) / gcdVal;
             }
             return lcm;
 
@@ -79,16 +83,6 @@ public class Solution : ISolver //, IDisplay
                 if (nodes.GetRowSpan(n)[2] is 'A')
                     currents[count++] = (n, 0);
             return currents[..count];
-        }
-
-        static bool IsAllInZ(Span<(int line, int length)> lines, ReadOnlySpan2D<char> nodes, int length)
-        {
-            foreach (ref var line in lines)
-                if (Node.Parse(nodes.GetRowSpan(line.line)).Name[^1] is not 'Z')
-                    return false;
-                else
-                    line.length = length;
-            return true;
         }
     }
 
