@@ -52,18 +52,19 @@ public class Solution : ISolver //, IDisplay
         }
         return Lcm(currents);
 
-        static ulong Lcm(ReadOnlySpan<(int, int)> arr)
+        static long Lcm(ReadOnlySpan<(int line, int length)> arr)
         {
-            ulong lcm = (ulong)arr[0].Item2;
-            for (int i = 1; i < arr.Length; i++) {
+            var lcm = (long)arr[0].length;
+            for (var i = 1; i < arr.Length; i++)
+            {
                 var num1 = lcm;
-                var num2 = (ulong)arr[i].Item2;
+                var num2 = (long)arr[i].length;
                 var gcdVal = Gcd(num1, num2);
-                lcm = (lcm * (ulong)arr[i].Item2) / gcdVal;
+                lcm = (lcm * (long)arr[i].length) / gcdVal;
             }
             return lcm;
 
-            static ulong Gcd(ulong num1, ulong num2)
+            static long Gcd(long num1, long num2)
             {
                 if (num2 == 0)
                     return num1;
