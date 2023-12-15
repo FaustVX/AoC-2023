@@ -3,6 +3,7 @@ namespace AdventOfCode.Y2023.Day10;
 
 using Point = (int row, int column);
 using Grid = ReadOnlySpan2D<char>;
+using System.Runtime.InteropServices;
 
 [ProblemInfo("Pipe Maze", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
@@ -14,7 +15,7 @@ public class Solution : ISolver //, IDisplay
 
     public object PartOne(ReadOnlyMemory<char> input)
     {
-        var grid = ParseInput(input.Span);
+        var grid = ParseInput(input.Span, out _);
         var (start, next1, next2) = GetOrigin(grid);
         return WalkBothDirection(start, next1, start, next2, grid) + 1;
 
@@ -85,7 +86,7 @@ public class Solution : ISolver //, IDisplay
         return 0;
     }
 
-    static Grid ParseInput(ReadOnlySpan<char> input)
+    static Span2D<char> ParseInput(ReadOnlySpan<char> input, out Span<char> span)
     {
         var size = (Globals.IsTestInput, Globals.InputFileName[^4]) switch
         {
@@ -97,6 +98,8 @@ public class Solution : ISolver //, IDisplay
             _ => throw new UnreachableException(),
         } + 2; // +2 for the dots around
 
-        return input.AsSpan2D(size, size + 1)[.., ..^1];
+        span = MemoryMarshal.CreateSpan(ref input.DangerousGetReference(), input.Length);
+
+        return span.AsSpan2D(size, size + 1)[.., ..^1];
     }
 }
