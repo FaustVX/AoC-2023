@@ -87,10 +87,14 @@ public class Solution : ISolver //, IDisplay
 
     static Grid ParseInput(ReadOnlySpan<char> input)
     {
-        var size = Globals.IsTestInput switch
+        var size = (Globals.IsTestInput, Globals.InputFileName[^4]) switch
         {
-            false => 140,
-            _ => 5,
+            (false, _) => 140,
+            (_, '1' or '2') => 5,
+            (_, '3') => 9,
+            (_, '4') => 8,
+            (_, '5' or '6') => 20,
+            _ => throw new UnreachableException(),
         } + 2; // +2 for the dots around
 
         return input.AsSpan2D(size, size + 1)[.., ..^1];
