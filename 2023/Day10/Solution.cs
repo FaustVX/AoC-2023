@@ -2,14 +2,14 @@
 namespace AdventOfCode.Y2023.Day10;
 
 using Point = (int row, int column);
-using Grid = ReadOnlySpan2D<char>;
+using ROGrid = ReadOnlySpan2D<char>;
 using System.Runtime.InteropServices;
 
 [ProblemInfo("Pipe Maze", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
 {
 #if DEBUG
-    static char At(Grid grid, Point point)
+    static char At(ROGrid grid, Point point)
     => grid[point.row, point.column];
 #endif
 
@@ -19,14 +19,14 @@ public class Solution : ISolver //, IDisplay
         var (start, next1, next2) = GetOrigin(grid);
         return WalkBothDirection(start, next1, start, next2, grid) + 1;
 
-        static int WalkBothDirection(Point previous1, Point current1, Point previous2, Point current2, Grid grid)
+        static int WalkBothDirection(Point previous1, Point current1, Point previous2, Point current2, ROGrid grid)
         {
             if (current1 == current2)
                 return 0;
             return WalkBothDirection(current1, NextPoint(previous1, current1, grid), current2, NextPoint(previous2, current2, grid), grid) + 1;
         }
 
-        static Point NextPoint(Point previous, Point current, Grid grid)
+        static Point NextPoint(Point previous, Point current, ROGrid grid)
         {
             return grid[current.row, current.column] switch
             {
@@ -52,12 +52,12 @@ public class Solution : ISolver //, IDisplay
             => (point.row + offset.row, point.column + offset.column);
         }
 
-        static (Point start, Point next1, Point next2) GetOrigin(Grid grid)
+        static (Point start, Point next1, Point next2) GetOrigin(ROGrid grid)
         {
             var start = grid.IndexOf('S');
             return (start, Next1(start, grid), Next2(start, grid));
 
-            static Point Next1(Point start, Grid grid)
+            static Point Next1(Point start, ROGrid grid)
             {
                 if (grid[start.row - 1, start.column] is '7' or 'F' or '|')
                     return (start.row - 1, start.column);
@@ -68,7 +68,7 @@ public class Solution : ISolver //, IDisplay
                 throw new UnreachableException();
             }
 
-            static Point Next2(Point start, Grid grid)
+            static Point Next2(Point start, ROGrid grid)
             {
                 if (grid[start.row, start.column - 1] is 'L' or 'F' or '-')
                     return (start.row, start.column - 1);
