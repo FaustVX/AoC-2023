@@ -84,18 +84,32 @@ public class Solution : ISolver //, IDisplay
         var previous = start;
         while (next != start)
         {
-            At(grid, previous) = '*';
+            Replace(ref At(grid, previous));
             (previous, next) = (next, NextPoint(previous, next, grid));
         }
-        At(grid, previous) = '*';
+        Replace(ref At(grid, previous));
         FloodFill(grid, (0, 0));
+        File.WriteAllText(Path.Combine("2023", "Day10", Path.ChangeExtension(Globals.InputFileName, "txt")), input.Span.ToString());
         return Count(grid);
+
+        static void Replace(ref char c)
+        => c = c switch
+        {
+            '|' => '┃',
+            '-' => '━',
+            'L' => '┗',
+            'J' => '┛',
+            '7' => '┓',
+            'F' => '┏',
+            'S' => '+',
+            _ => throw new UnreachableException(),
+        };
 
         static int Count(ROGrid grid)
         {
             var sum = 0;
             foreach (var cell in grid)
-                if (cell is not '*')
+                if (cell is not ((>= '━' and <= '┛') or '+'))
                     sum++;
             return sum;
         }
@@ -105,8 +119,8 @@ public class Solution : ISolver //, IDisplay
             if (point is not (>= 0, >= 0) || At(grid, point) is '*')
                 return;
             ref var at = ref At(grid, point);
-            if (at != '*')
-                at = '*';
+            if (at is not ((>= '━' and <= '┛') or '+'))
+                at = '+';
 
             FloodFill(grid, NextPoint(grid, point));
             FloodFill(grid, NextPoint(grid, point));
@@ -115,13 +129,13 @@ public class Solution : ISolver //, IDisplay
 
             static Point NextPoint(Grid grid, Point point)
             {
-                if (IsInGrid(Add(point, (0, 1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, 1))) is not '*')
+                if (IsInGrid(Add(point, (0, 1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, 1))) is not ((>= '━' and <= '┛') or '+'))
                     return Add(point, (0, 1));
-                if (IsInGrid(Add(point, (1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (1, 0))) is not '*')
+                if (IsInGrid(Add(point, (1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (1, 0))) is not ((>= '━' and <= '┛') or '+'))
                     return Add(point, (1, 0));
-                if (IsInGrid(Add(point, (0, -1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, -1))) is not '*')
+                if (IsInGrid(Add(point, (0, -1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, -1))) is not ((>= '━' and <= '┛') or '+'))
                     return Add(point, (0, -1));
-                if (IsInGrid(Add(point, (-1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (-1, 0))) is not '*')
+                if (IsInGrid(Add(point, (-1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (-1, 0))) is not ((>= '━' and <= '┛') or '+'))
                     return Add(point, (-1, 0));
                 return (-1, -1);
 
