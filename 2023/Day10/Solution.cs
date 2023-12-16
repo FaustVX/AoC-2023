@@ -11,7 +11,7 @@ public class Solution : ISolver //, IDisplay
 {
     public object PartOne(ReadOnlyMemory<char> input)
     {
-        var grid = ParseInput(input.Span, out _);
+        var grid = ParseInput(input.Span);
         var (start, next1, next2) = GetOrigin(grid);
         return WalkBothDirection(start, next1, start, next2, grid) + 1;
 
@@ -79,7 +79,7 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        var grid = ParseInput(input.Span, out var span);
+        var grid = ParseInput(input.Span);
         var (start, next) = GetOrigin(grid);
         var previous = start;
         while (next != start)
@@ -177,7 +177,7 @@ public class Solution : ISolver //, IDisplay
     static ref char At(Grid grid, Point point)
     => ref grid[point.row, point.column];
 
-    static Grid ParseInput(ReadOnlySpan<char> input, out Span<char> span)
+    static Grid ParseInput(ReadOnlySpan<char> input)
     {
         var size = (Globals.IsTestInput, Globals.InputFileName[^4]) switch
         {
@@ -189,7 +189,7 @@ public class Solution : ISolver //, IDisplay
             _ => throw new UnreachableException(),
         } + 2; // +2 for the dots around
 
-        span = MemoryMarshal.CreateSpan(ref input.DangerousGetReference(), input.Length);
+        var span = MemoryMarshal.CreateSpan(ref input.DangerousGetReference(), input.Length);
 
         return span.AsSpan2D(size, size + 1)[.., ..^1];
     }
