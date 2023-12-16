@@ -3,16 +3,12 @@ namespace AdventOfCode.Y2023.Day10;
 
 using Point = (int row, int column);
 using ROGrid = ReadOnlySpan2D<char>;
+using Grid = Span2D<char>;
 using System.Runtime.InteropServices;
 
 [ProblemInfo("Pipe Maze", normalizeInput: false)]
 public class Solution : ISolver //, IDisplay
 {
-#if DEBUG
-    static char At(ROGrid grid, Point point)
-    => grid[point.row, point.column];
-#endif
-
     public object PartOne(ReadOnlyMemory<char> input)
     {
         var grid = ParseInput(input.Span, out _);
@@ -83,10 +79,105 @@ public class Solution : ISolver //, IDisplay
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
-        return 0;
+        var grid = ParseInput(input.Span, out var span);
+        var (start, next) = GetOrigin(grid);
+        var previous = start;
+        while (next != start)
+        {
+            At(grid, previous) = '*';
+            (previous, next) = (next, NextPoint(previous, next, grid));
+        }
+        At(grid, previous) = '*';
+        FloodFill(grid, (0, 0));
+        return Count(grid);
+
+        static int Count(ROGrid grid)
+        {
+            var sum = 0;
+            foreach (var cell in grid)
+                if (cell is not '*')
+                    sum++;
+            return sum;
+        }
+
+        static void FloodFill(Grid grid, Point point)
+        {
+            if (point is not (>= 0, >= 0) || At(grid, point) is '*')
+                return;
+            ref var at = ref At(grid, point);
+            if (at != '*')
+                at = '*';
+
+            FloodFill(grid, NextPoint(grid, point));
+            FloodFill(grid, NextPoint(grid, point));
+            FloodFill(grid, NextPoint(grid, point));
+            FloodFill(grid, NextPoint(grid, point));
+
+            static Point NextPoint(Grid grid, Point point)
+            {
+                if (IsInGrid(Add(point, (0, 1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, 1))) is not '*')
+                    return Add(point, (0, 1));
+                if (IsInGrid(Add(point, (1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (1, 0))) is not '*')
+                    return Add(point, (1, 0));
+                if (IsInGrid(Add(point, (0, -1)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (0, -1))) is not '*')
+                    return Add(point, (0, -1));
+                if (IsInGrid(Add(point, (-1, 0)), (grid.Width - 1, grid.Height - 1)) && At(grid, Add(point, (-1, 0))) is not '*')
+                    return Add(point, (-1, 0));
+                return (-1, -1);
+
+                static bool IsInGrid(Point point, Point size)
+                => point is (>= 0, >= 0) && Offset(point, size) is (>= 0, >= 0);
+            }
+        }
+
+        static Point NextPoint(Point previous, Point current, Grid grid)
+        {
+            return grid[current.row, current.column] switch
+            {
+                '|' when Offset(previous, current) is (1, 0) => Add(current, (1, 0)),
+                '|' => Add(current, (-1, 0)),
+                '-' when Offset(previous, current) is (0, 1) => Add(current, (0, 1)),
+                '-' => Add(current, (0, -1)),
+                'L' when Offset(previous, current) is (1, 0) => Add(current, (0, 1)),
+                'L' => Add(current, (-1, 0)),
+                'J' when Offset(previous, current) is (1, 0) => Add(current, (0, -1)),
+                'J' => Add(current, (-1, 0)),
+                '7' when Offset(previous, current) is (0, 1) => Add(current, (1, 0)),
+                '7' => Add(current, (0, -1)),
+                'F' when Offset(previous, current) is (0, -1) => Add(current, (1, 0)),
+                'F' => Add(current, (0, 1)),
+                _ => throw new UnreachableException(),
+            };
+        }
+
+        static Point Offset(Point from, Point to)
+        => (to.row - from.row, to.column - from.column);
+
+        static Point Add(Point point, Point offset)
+        => (point.row + offset.row, point.column + offset.column);
+
+        static (Point start, Point next) GetOrigin(Grid grid)
+        {
+            var start = grid.IndexOf('S');
+            return (start, Next1(start, grid));
+
+            static Point Next1(Point start, Grid grid)
+            {
+                if (grid[start.row - 1, start.column] is '7' or 'F' or '|')
+                    return (start.row - 1, start.column);
+                if (grid[start.row, start.column + 1] is 'J' or '7' or '-')
+                    return (start.row, start.column + 1);
+                if (grid[start.row + 1, start.column] is 'J' or 'L' or '|')
+                    return (start.row + 1, start.column);
+                throw new UnreachableException();
+            }
+        }
     }
 
-    static Span2D<char> ParseInput(ReadOnlySpan<char> input, out Span<char> span)
+    static ref char At(Grid grid, Point point)
+    => ref grid[point.row, point.column];
+
+    static Grid ParseInput(ReadOnlySpan<char> input, out Span<char> span)
     {
         var size = (Globals.IsTestInput, Globals.InputFileName[^4]) switch
         {
