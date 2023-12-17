@@ -50,17 +50,17 @@ public class Solution : ISolver //, IDisplay
         static int CalculateTotalDistances(ReadOnlySpan<(int x, int y)> galaxies, ReadOnlySpan<int> emptyRows, ReadOnlySpan<int> emptyCols)
         {
             var sum = 0;
-            foreach (var pos1 in galaxies)
+            foreach (var (x1, y1) in galaxies)
             {
                 galaxies = galaxies[1..];
-                foreach (var pos2 in galaxies)
+                foreach (var (x2, y2) in galaxies)
                 {
-                    var distance = Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y);
+                    var distance = Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
                     foreach (var col in emptyCols)
-                        if (col >= Math.Min(pos1.x, pos2.x) && col <= Math.Max(pos1.x, pos2.x))
+                        if (col >= Math.Min(x1, x2) && col <= Math.Max(x1, x2))
                             distance++;
                     foreach (var row in emptyRows)
-                        if (row >= Math.Min(pos1.y, pos2.y) && row <= Math.Max(pos1.y, pos2.y))
+                        if (row >= Math.Min(y1, y2) && row <= Math.Max(y1, y2))
                             distance++;
                     sum += distance;
                 }
