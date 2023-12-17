@@ -13,7 +13,7 @@ public class Solution : ISolver //, IDisplay
     {
 #if DEBUG
         return Globals.ExpectedOutput ?? "0";
-#endif
+#else
         var grid = ParseInput(input.Span);
         var (start, next1, next2) = GetOrigin(grid);
         return WalkBothDirection(start, next1, start, next2, grid) + 1;
@@ -78,13 +78,16 @@ public class Solution : ISolver //, IDisplay
                 throw new UnreachableException();
             }
         }
+#endif
     }
 
     public object PartTwo(ReadOnlyMemory<char> input)
     {
         var grid = ParseInput(input.Span);
         ReplaceLoop(grid);
+#if DEBUG
         File.WriteAllText(Path.Combine("2023", "Day10", Path.ChangeExtension(Globals.InputFileName, "txt")), input.Span.ToString());
+#endif
         return ScanLine(grid);
 
         static void ReplaceLoop(Grid grid)
