@@ -51,10 +51,10 @@ public class Solution : ISolver //, IDisplay
         {
             var sum = 0;
             foreach (var pos1 in galaxies)
+            {
+                galaxies = galaxies[1..];
                 foreach (var pos2 in galaxies)
                 {
-                    if (pos1 == pos2)
-                        continue;
                     var distance = Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y);
                     foreach (var col in emptyCols)
                         if (col >= Math.Min(pos1.x, pos2.x) && col <= Math.Max(pos1.x, pos2.x))
@@ -64,7 +64,8 @@ public class Solution : ISolver //, IDisplay
                             distance++;
                     sum += distance;
                 }
-            return sum / 2;
+            }
+            return sum;
         }
     }
 
