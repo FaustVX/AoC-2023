@@ -18,7 +18,7 @@ public class Solution : ISolver //, IDisplay
         ParseEmptyLine(grid, ref emptyRows, static (grid, i) => grid.GetRow(i), grid.Height);
         ParseEmptyLine(grid, ref emptyCols, static (grid, i) => grid.GetColumn(i), grid.Height);
         FindGalaxies(grid, ref galaxies);
-        return 0;
+        return CalculateTotalDistances(galaxies, emptyRows, emptyCols);
 
         static void ParseEmptyLine(Grid grid, ref Span<int> span, GetLineHandler handler, int length)
         {
@@ -45,6 +45,26 @@ public class Solution : ISolver //, IDisplay
                     if (grid[y, x] is '#')
                         galaxies[idx++] = (x, y);
             galaxies = galaxies[..idx];
+        }
+
+        static int CalculateTotalDistances(ReadOnlySpan<(int x, int y)> galaxies, ReadOnlySpan<int> emptyRows, ReadOnlySpan<int> emptyCols)
+        {
+            var sum = 0;
+            foreach (var pos1 in galaxies)
+                foreach (var pos2 in galaxies)
+                {
+                    if (pos1 == pos2)
+                        continue;
+                    var distance = Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y);
+                    foreach (var col in emptyCols)
+                        if (col >= Math.Min(pos1.x, pos2.x) && col <= Math.Max(pos1.x, pos2.x))
+                            distance++;
+                    foreach (var row in emptyRows)
+                        if (row >= Math.Min(pos1.y, pos2.y) && row <= Math.Max(pos1.y, pos2.y))
+                            distance++;
+                    sum += distance;
+                }
+            return sum / 2;
         }
     }
 
