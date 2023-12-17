@@ -14,8 +14,10 @@ public class Solution : ISolver //, IDisplay
         var grid = ParseInput(input.Span);
         var emptyRows = (stackalloc int[10]);
         var emptyCols = (stackalloc int[10]);
+        var galaxies = (stackalloc (int x, int y)[500]);
         ParseEmptyLine(grid, ref emptyRows, static (grid, i) => grid.GetRow(i), grid.Height);
         ParseEmptyLine(grid, ref emptyCols, static (grid, i) => grid.GetColumn(i), grid.Height);
+        FindGalaxies(grid, ref galaxies);
         return 0;
 
         static void ParseEmptyLine(Grid grid, ref Span<int> span, GetLineHandler handler, int length)
@@ -33,6 +35,16 @@ public class Solution : ISolver //, IDisplay
                         return false;
                 return true;
             }
+        }
+
+        static void FindGalaxies(Grid grid, ref Span<(int, int)> galaxies)
+        {
+            var idx = 0;
+            for (var y = 0; y < grid.Height; y++)
+                for (var x = 0; x < grid.Width; x++)
+                    if (grid[y, x] is '#')
+                        galaxies[idx++] = (x, y);
+            galaxies = galaxies[..idx];
         }
     }
 
